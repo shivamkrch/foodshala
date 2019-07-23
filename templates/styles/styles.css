@@ -1,0 +1,62 @@
+@import url("https://fonts.googleapis.com/css?family=Pacifico|Roboto+Slab&display=swap");
+
+body {
+  font-family: Roboto Slab, serif;
+}
+
+.navbar-brand {
+  font-family: Pacifico, cursive;
+  font-size: 1.5rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+#userDropDown {
+  background: #f0f1f1;
+  border-radius: 5px;
+}
+
+#userDropDown > .nav-link.dropdown-toggle {
+  color: black !important;
+}
+
+.slider {
+  height: 60vh;
+  background: url("https://images.unsplash.com/photo-1498654896293-37aacf113fd9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80")
+    no-repeat;
+  background-size: cover;
+}
+
+.align-middle-vertical {
+  position: relative;
+  top: 45%;
+}
+
+.heading {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.user-name {
+  font-weight: 400;
+  letter-spacing: 1.5px;
+}
+
+.features {
+  background-color: rgb(7, 131, 33) !important;
+}
+
+.feat-head {
+  font-weight: 600;
+}
+
+#showPwdBtn {
+  border: 1px solid #ced4da;
+}
+
+@media (max-width: 576px) {
+  .slider {
+    height: 35vh;
+  }
+}
