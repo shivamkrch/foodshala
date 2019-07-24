@@ -1,0 +1,81 @@
+<div class="modal fade mt-5 pt-5" id="addMenuModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header shadow">
+        <h5 class="modal-title">Add Menu</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center pt-4">
+        <center>
+          <div
+            class="alert alert-danger text-center col-md-6"
+            role="alert"
+            id="addMenuError"
+            style="display: none"
+          >
+            Unable to add! Please try again.
+          </div>
+        </center>
+        <form class="m-3" id="addMenuForm">
+          <input
+            type="text"
+            class="form-control mb-1"
+            id="itemName"
+            name="itemName"
+            placeholder="Food/Dish"
+            required
+          />
+          <div class="custom-control custom-checkbox float-left">
+            <input
+              type="checkbox"
+              class="custom-control-input mb-3"
+              id="veg"
+              name="veg"
+            />
+            <label
+              class="custom-control-label"
+              for="veg"
+              style="font-size: 1rem;"
+              >Non-Veg</label
+            >
+          </div>
+          <textarea
+            name="itemIngreds"
+            id="itemIngreds"
+            rows="3"
+            placeholder="Ingredients/Items included"
+            class="form-control mb-3"
+            required
+          ></textarea>
+          <input
+            type="number"
+            class="form-control mb-3"
+            id="itemCost"
+            name="itemCost"
+            placeholder="Cost"
+            required
+          />
+          <input type="hidden" id="itemRestId" name="itemRestId" required />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger mr-4" data-dismiss="modal">
+          Cancel
+        </button>
+        <input
+          type="submit"
+          class="btn btn-success"
+          value="Add Menu"
+          form="addMenuForm"
+        />
+      </div>
+    </div>
+  </div>
+</div>

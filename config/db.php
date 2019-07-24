@@ -9,7 +9,7 @@ class DB{
 
     private $conn;
     private $error;
-    private $qError;
+    public $qError;
 
     private $stmt;
 

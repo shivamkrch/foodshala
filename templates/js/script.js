@@ -93,7 +93,7 @@ window.onload = function() {
       "/api/login",
       loginData,
       function(res) {
-        if (res) {
+        if (res == true) {
           window.location = "/orders";
         } else {
           $("#regError").fadeIn("fast");
@@ -101,5 +101,51 @@ window.onload = function() {
       },
       "json"
     );
+  });
+  $("#addMenuModal").on("show.bs.modal", function(event) {
+    var button = $(event.relatedTarget); // Button that triggered the modal
+    var restId = button.data("restid");
+    var modal = $(this);
+    $("input#itemRestId").val(restId);
+  });
+  // Add Menu Item
+  $("#addMenuForm").submit(function(e) {
+    e.preventDefault();
+    let menuData = getFormDataAsJSON($(this));
+    if (menuData.veg) {
+      menuData.veg = 0;
+    } else {
+      menuData.veg = 1;
+    }
+    $.post(
+      "/api/restaurant/menu",
+      menuData,
+      function(res) {
+        if (res) {
+          window.location = "/menu";
+        } else {
+          $("#addMenuError").fadeIn("fast");
+        }
+      },
+      "json"
+    );
+  });
+
+  // Remove menu Item
+  $(".removeMenu").click(function(e) {
+    e.preventDefault();
+    let id = $(this).attr("id");
+    $.ajax({
+      url: `/api/restaurant/menu/${id}`,
+      type: "DELETE",
+      success: function(res) {
+        if (res) {
+          window.location = "/menu";
+        } else {
+          $(".toast.removeMenuErr").toast("show");
+        }
+      },
+      dataType: "json"
+    });
   });
 };

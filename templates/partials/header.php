@@ -75,7 +75,9 @@
           <li class="nav-item">
             <a class="nav-link" href="/login">Login</a>
           </li>
-          <?php } if(isAuthenticated()){ ?>
+          <?php } if(isAuthenticated()){ 
+            
+            ?>
           <li class="nav-item dropdown px-2 ml-2" id="userDropDown">
             <a
               class="nav-link dropdown-toggle"
@@ -86,11 +88,19 @@
               aria-haspopup="true"
               aria-expanded="false"
             >
-              <i class="far fa-user"></i> User Name
+            <?php if($_COOKIE['user-type']=='cust'){ ?>
+              <i class="far fa-user mr-1"></i> 
+              <?php }else{ ?>
+                <i class="fas fa-hotel mr-1" style="font-size: 1rem;"></i> 
+            <?php } ?>
+
+              <?=$res['name'] ?>
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="/orders">Orders</a>
+              <?php if(isset($_COOKIE['user-type']) && $_COOKIE['user-type']=='rest') { ?>
               <a class="dropdown-item" href="/menu">Menu</a>
+              <?php } ?>
               <a class="dropdown-item" href="/logout">Logout</a>
             </div>
           </li>

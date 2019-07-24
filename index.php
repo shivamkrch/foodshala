@@ -5,15 +5,21 @@ require_once __DIR__.'/config/auth.php';
 
 $router = new Klein\Klein();
 
-$router->respond('GET','/', function($req, $res, $service){
+$router->respond('GET', '/', function($req, $res, $service){
     $service->render(__DIR__.'/templates/pages/home.php');
 });
 
-$router->respond('/login', function($req, $res, $service){
+$router->respond('GET', '/login', function($req, $res, $service){
     if(isAuthenticated()){
         header('location: /orders');
     }
     $service->render(__DIR__.'/templates/pages/login.php');
+});
+
+$router->respond('GET', '/logout', function($req, $res, $service){
+    setcookie('user-email', null, time()-1, '/');
+    setcookie('user-type', null, time()-1, '/');
+    $res->redirect('/login');
 });
 
 $router->respond('/orders', function($req, $res, $service){
@@ -23,12 +29,34 @@ $router->respond('/orders', function($req, $res, $service){
     $service->render(__DIR__.'/templates/pages/orders.php');
 });
 
+$router->respond('/menu', function($req, $res, $service){
+    if(!isAuthenticated()){
+        header('location: /login');
+    }elseif(isAuthenticated() && $_COOKIE['user-type']=='cust'){
+        header('location: /');
+    }
+    $db = new DB();
+    $db->query("SELECT id from restaurants WHERE email=:email");
+    $db->bind(':email', $_COOKIE['user-email']);
+    $_GET['menu_rest_id'] = $db->single()['id'];
+    $db->terminate();
+    $service->render(__DIR__.'/templates/pages/restaurants/menu.php');
+});
+
 $router->with('/restaurant', function() use ($router){
     $router->respond('/register', function($req, $res, $service){
         if(isAuthenticated()){
             header('location: /orders');
         }
         $service->render(__DIR__.'/templates/pages/restaurants/register.php');
+    });
+
+    $router->respond('/[i:id]', function($req, $res, $service){
+        if(isAuthenticated() && $_COOKIE['user-type']=='rest'){
+            header('location: /menu');
+        }
+        $_GET['menu_rest_id'] = $req->id;
+        $service->render(__DIR__.'/templates/pages/restaurants/menu.php');
     });
 });
 
@@ -102,7 +130,7 @@ $router->with('/api', function() use ($router){
                     $db->bind(':pwd', $pwd);
                     $db->bind(':loc', $req->location);
                     $result = $db->execute();
-                    if (!is_null($db->queryError())) {
+                    if ($db->queryError()) {
                         return json_encode('false');
                     }
                     return json_encode($result);
@@ -110,6 +138,43 @@ $router->with('/api', function() use ($router){
                 $db->terminate();
             }else{
                 return "Invalid request";
+            }
+        });
+
+        $router->respond('POST', '/menu', function($req, $res, $service){
+            if(isAuthenticated()){
+                $db = new DB();
+                $db->query("INSERT INTO `food_items` (name, ingredients, veg, rest_id, cost) 
+                VALUES(:name, :ingreds, :veg, :restid, :cost)");
+                $db->bind(':name', $req->itemName);
+                $db->bind(':ingreds', $req->itemIngreds);
+                $db->bind(':veg', $req->veg);
+                $db->bind(':restid', $req->itemRestId);
+                $db->bind(':cost', $req->itemCost);
+                $result = $db->execute();
+                if ($db->queryError()) {
+                    return json_encode(FALSE);
+                }
+                return json_encode(TRUE);
+                $db->terminate();
+            }else{
+                return json_encode(FALSE);
+            }
+        });
+
+        $router->respond('DELETE', '/menu/[i:id]', function($req, $res, $service){
+            if(isAuthenticated()){
+                $db = new DB();
+                $db->query("DELETE FROM `food_items` WHERE id=:id");
+                $db->bind(':id', $req->id);
+                $result = $db->execute();
+                if ($db->queryError()) {
+                    return json_encode(FALSE);
+                }
+                return json_encode(TRUE);
+                $db->terminate();
+            }else{
+                return json_encode(FALSE);
             }
         });
     });
