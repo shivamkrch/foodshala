@@ -8,6 +8,7 @@
         </div>
     </center>
     <form id="restRegForm" class="mt-5 col-md-6 mx-auto">
+        <!-- Restaurant's name field -->
         <div class="input-group input-group-lg mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">
@@ -17,6 +18,7 @@
             <input type="text" class="form-control form-control-lg" placeholder="Full Name"
              name="name" required>
         </div>
+        <!-- Restaurant's email field -->
         <div class="input-group input-group-lg mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">@</span>
@@ -24,6 +26,7 @@
             <input type="email" class="form-control form-control-lg" placeholder="Email"
              name="email" required>
         </div>
+        <!-- Restaurant's location field -->
         <div class="input-group input-group-lg mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">
@@ -33,6 +36,7 @@
             <input type="text" class="form-control form-control-lg" placeholder="Location"
              name="location" required>
         </div>
+        <!-- Restaurant's password field -->
         <div class="input-group input-group-lg mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">
@@ -51,5 +55,7 @@
     </form>
     <p class="text-center mb-1 mt-4">Already registered?<a href="/login" class="ml-2">Login</a></p>
 </div>
-
+<script>
+    document.title = "Restaurant's Registration | FoodShala";
+</script>
 <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/templates/partials/footer.html'; ?>

@@ -24,6 +24,7 @@
           </div>
         </center>
         <form class="m-3" id="addMenuForm">
+          <!-- Food item name field -->
           <input
             type="text"
             class="form-control mb-1"
@@ -32,6 +33,7 @@
             placeholder="Food/Dish"
             required
           />
+          <!-- Food item type (veg or non-veg) -->
           <div class="custom-control custom-checkbox float-left">
             <input
               type="checkbox"
@@ -40,20 +42,22 @@
               name="veg"
             />
             <label
-              class="custom-control-label"
+              class="custom-control-label mt-1 pt-1"
               for="veg"
               style="font-size: 1rem;"
               >Non-Veg</label
             >
           </div>
+          <!-- Food item description -->
           <textarea
             name="itemIngreds"
             id="itemIngreds"
             rows="3"
-            placeholder="Ingredients/Items included"
+            placeholder="Ingredients/Items/Description"
             class="form-control mb-3"
             required
           ></textarea>
+          <!-- Cost of the item -->
           <input
             type="number"
             class="form-control mb-3"
@@ -62,6 +66,7 @@
             placeholder="Cost"
             required
           />
+          <!-- Hidden field which stores restaurant id -->
           <input type="hidden" id="itemRestId" name="itemRestId" required />
         </form>
       </div>

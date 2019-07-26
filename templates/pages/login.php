@@ -9,15 +9,17 @@
         </div>
     </center>
     <form id="loginForm" class="mt-5 col-md-6 mx-auto">
+        <!-- Email field -->
         <div class="input-group input-group-lg mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">
-                    <i class="fas fa-user-alt"></i>
+                   @
                 </span>
             </div>
             <input type="email" class="form-control form-control-lg" placeholder="Email"
              name="email" required>
         </div>
+        <!-- Password field -->
         <div class="input-group input-group-lg mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">
@@ -38,5 +40,7 @@
     <p class="text-center my-1"><a href="/customer/register">Register as Customer</a></p>
     <p class="text-center my-1"><a href="/restaurant/register">Register a Restaurant</a></p>
 </div>
-
+<script>
+    document.title = "Login | FoodShala";
+</script>
 <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/templates/partials/footer.html'; ?>

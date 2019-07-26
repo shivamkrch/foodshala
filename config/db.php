@@ -14,12 +14,13 @@ class DB{
     private $stmt;
 
     public function __construct() {
+        // Credentials to connect to MySQl Database
         $this->host = 'localhost';
         $this->user = 'root';
         $this->password = '';
 	    $this->dbName = 'foodshala_db';
 		
-        //pdo for mysql
+        // PDO for mysql
         $pdo = "mysql:host=" . $this->host . ";dbname=" . $this->dbName;
         $options = array(
             PDO::ATTR_PERSISTENT => false,
@@ -35,10 +36,12 @@ class DB{
 
     }
 
+    // Prepare the query
     public function query($query){
         $this->stmt = $this->conn->prepare($query);
     }
 
+    // Bind the related values
     public function bind($param, $value, $type = null){
         if (is_null($type)) {
             switch (true) {
@@ -58,6 +61,7 @@ class DB{
         $this->stmt->bindValue($param, $value, $type);
     }
 
+    // Run the query
     public function execute(){
         return $this->stmt->execute();
 
@@ -67,25 +71,31 @@ class DB{
         }
        
     }
+
+    // Fetch all the result of the query
     public function resultset(){
         $this->execute();
         return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    // Fetch only single result of the query
     public function single(){
         $this->execute();
         return $this->stmt->fetch(PDO::FETCH_ASSOC);
     }
     
+    // Get the row count of the query
     public function rowCount(){
         return $this->stmt->rowCount();
     }
 
+    // Check if an error has occured
     public function queryError(){
         $this->qError = $this->conn->errorInfo();
         return !is_null($this->qError[2]);
     }
 
+    // Terminate the connection
     public function terminate(){
         $this->conn = null;
     }

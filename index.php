@@ -3,25 +3,31 @@ require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/config/db.php';
 require_once __DIR__.'/config/auth.php';
 
+// Initializing router
 $router = new Klein\Klein();
 
+// Home page route
 $router->respond('GET', '/', function($req, $res, $service){
     $service->render(__DIR__.'/templates/pages/home.php');
 });
 
+// Login page route
 $router->respond('GET', '/login', function($req, $res, $service){
     if(isAuthenticated()){
-        header('location: /orders');
+        header('location: /');
     }
     $service->render(__DIR__.'/templates/pages/login.php');
 });
 
+// Logout page route
 $router->respond('GET', '/logout', function($req, $res, $service){
+    // Remove both saved cookies
     setcookie('user-email', null, time()-1, '/');
     setcookie('user-type', null, time()-1, '/');
     $res->redirect('/login');
 });
 
+// Orders page route
 $router->respond('/orders', function($req, $res, $service){
     if(!isAuthenticated()){
         header('location: /login');
@@ -29,10 +35,11 @@ $router->respond('/orders', function($req, $res, $service){
     $service->render(__DIR__.'/templates/pages/orders.php');
 });
 
+// Menu page route, only for restaurants
 $router->respond('/menu', function($req, $res, $service){
     if(!isAuthenticated()){
         header('location: /login');
-    }elseif(isAuthenticated() && $_COOKIE['user-type']=='cust'){
+    }elseif(isAuthenticated() && $_COOKIE['user-type'] == 'cust'){
         header('location: /');
     }
     $db = new DB();
@@ -43,7 +50,11 @@ $router->respond('/menu', function($req, $res, $service){
     $service->render(__DIR__.'/templates/pages/restaurants/menu.php');
 });
 
+// Routes for rstaurants
+// Routes starting with /restaurant
 $router->with('/restaurant', function() use ($router){
+
+    // Restaurants registration page route
     $router->respond('/register', function($req, $res, $service){
         if(isAuthenticated()){
             header('location: /orders');
@@ -51,8 +62,9 @@ $router->with('/restaurant', function() use ($router){
         $service->render(__DIR__.'/templates/pages/restaurants/register.php');
     });
 
+    // Restaurants menu page route
     $router->respond('/[i:id]', function($req, $res, $service){
-        if(isAuthenticated() && $_COOKIE['user-type']=='rest'){
+        if(isAuthenticated() && $_COOKIE['user-type'] == 'rest'){
             header('location: /menu');
         }
         $_GET['menu_rest_id'] = $req->id;
@@ -60,17 +72,26 @@ $router->with('/restaurant', function() use ($router){
     });
 });
 
+// Routes starting with /customer
 $router->with('/customer', function() use ($router){
+
+    // Customer registration route
     $router->respond('/register', function($req, $res, $service){
         if(isAuthenticated()){
-            header('location: /orders');
+            header('location: /');
         }
         $service->render(__DIR__.'/templates/pages/customers/register.php');
     });
 });
 
+// API routes, starting with /api
 $router->with('/api', function() use ($router){
+
+    // Routes starting with /api/customer
     $router->with('/customer', function() use ($router){
+
+        // Route /api/customer/register
+        // Register new customer
         $router->respond('POST','/register', function($req, $res, $service){
             if(isset($req->name) && isset($req->email) && isset($req->password) && isset($req->veg)){
                 $db = new DB();
@@ -107,7 +128,11 @@ $router->with('/api', function() use ($router){
         
     });
 
+    // Routes starting with /api/restaurant
     $router->with('/restaurant', function() use ($router){
+
+        // Route /api/restaurant/register
+        // Register new restaurant
         $router->respond('POST','/register', function($req, $res, $service){
             if(isset($req->name) && isset($req->email) && isset($req->password) && isset($req->location)){
                 $db = new DB();
@@ -141,6 +166,8 @@ $router->with('/api', function() use ($router){
             }
         });
 
+        // Route /api/restaurant/menu
+        // Add new menu item to restaurant
         $router->respond('POST', '/menu', function($req, $res, $service){
             if(isAuthenticated()){
                 $db = new DB();
@@ -162,6 +189,8 @@ $router->with('/api', function() use ($router){
             }
         });
 
+        // Route /api/restaurant/menu/{id}
+        // Delete a menu item by id
         $router->respond('DELETE', '/menu/[i:id]', function($req, $res, $service){
             if(isAuthenticated()){
                 $db = new DB();
@@ -179,9 +208,12 @@ $router->with('/api', function() use ($router){
         });
     });
 
+    // Route /api/login
+    // User login route
     $router->respond('POST', '/login', function($req, $res, $service) use($router){
         if(isset($req->email) && isset($req->password)){
             $db = new DB();
+            // Select from both restaurant and customer tables
             $db->query("SELECT pwd FROM `customers` WHERE email=:email");
             $db->bind(':email', $req->email);
             $resCust = $db->single();
@@ -189,12 +221,18 @@ $router->with('/api', function() use ($router){
             $db->bind(':email', $req->email);
             $resRest = $db->single();
             $pwd = md5($req->password);
+            // Check for same password for customer if exists
             if($pwd == $resCust['pwd']){
+                // Set cookie with key 'user-email' to matched customer's email
                 setcookie('user-email', $req->email, time()+3600*24*20, '/');
+                // Set cookie with key 'user-type' to 'cust' representing customers
                 setcookie('user-type', 'cust', time()+3600*24*20, '/');
                 return json_encode(TRUE);
+            // Check for same password for customer if exists
             }elseif($pwd == $resRest['pwd']){
+                // Set cookie with key 'user-email' to matched customer's email
                 setcookie('user-email', $req->email, time()+3600*24*20, '/');
+                // Set cookie with key 'user-type' to 'rest' representing restaurants
                 setcookie('user-type', 'rest', time()+3600*24*20, '/');
                 return json_encode(TRUE);
             }else{
@@ -203,6 +241,38 @@ $router->with('/api', function() use ($router){
             $db->terminate();
         }else{
             return "Invalid request";
+        }
+    });
+
+    // Route /api/order/{restId}/{menuId}
+    // Route to add a new order with restaurant id and menu id
+    $router->respond('POST', '/order/[i:restId]/[i:menuId]', function($req, $res){
+        if(isAuthenticated() && $_COOKIE['user-type'] == 'cust'){
+            if(isset($req->restId) && isset($req->menuId)){
+                $db = new DB();
+                $db->query("SELECT id FROM customers WHERE email=:email");
+                $db->bind(':email', $_COOKIE['user-email']);
+                $custId = $db->single()['id'];
+                if(!$db->queryError()){
+                    $db->query("INSERT INTO orders (rest_id, cust_id, food_id) VALUES(:rest, :cust, :food)");
+                    $db->bind(':rest', $req->restId);
+                    $db->bind(':cust', $custId);
+                    $db->bind(':food', $req->menuId);
+                    $db->execute();
+                    if(!$db->queryError()){
+                        return json_encode(TRUE);
+                    }else{
+                        return json_encode(FALSE);
+                    }
+                }else{
+                    return json_encode(FALSE);
+                }
+            }else{
+                return json_encode(FALSE);
+            }
+            $db->terminate();
+        }else{
+            return json_encode(FALSE);
         }
     });
     

@@ -21,6 +21,7 @@ window.onload = function() {
     }
   });
 
+  // Get form data as JSON
   function getFormDataAsJSON(form) {
     let formData = form.serializeArray();
     let data = {};
@@ -94,7 +95,7 @@ window.onload = function() {
       loginData,
       function(res) {
         if (res == true) {
-          window.location = "/orders";
+          window.location = "/";
         } else {
           $("#regError").fadeIn("fast");
         }
@@ -102,12 +103,15 @@ window.onload = function() {
       "json"
     );
   });
+
+  // Set restaurant id to the hidden field in the add-menu modal
   $("#addMenuModal").on("show.bs.modal", function(event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
     var restId = button.data("restid");
     var modal = $(this);
     $("input#itemRestId").val(restId);
   });
+
   // Add Menu Item
   $("#addMenuForm").submit(function(e) {
     e.preventDefault();
@@ -142,10 +146,28 @@ window.onload = function() {
         if (res) {
           window.location = "/menu";
         } else {
-          $(".toast.removeMenuErr").toast("show");
+          alert("Unable to remove item! Please try again.");
         }
       },
       dataType: "json"
     });
+  });
+
+  // Order an item
+  $(".orderBtn").click(function(e) {
+    e.preventDefault();
+    let menuId = $(this).attr("data-menuid");
+    let restId = $(this).attr("data-restid");
+    $.post(
+      `/api/order/${restId}/${menuId}`,
+      function(res) {
+        if (res) {
+          window.location = "/orders";
+        } else {
+          window.location = "/login";
+        }
+      },
+      "json"
+    );
   });
 };
