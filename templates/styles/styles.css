@@ -59,4 +59,11 @@ body {
   .slider {
     height: 35vh;
   }
+  .user-name{
+    font-size: 12vw;
+    padding-top: 0 !important;
+  }
+  .heading{
+    padding-top: 1.5rem !important;
+  }
 }
